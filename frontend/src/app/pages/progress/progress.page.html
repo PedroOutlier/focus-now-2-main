@@ -1,0 +1,143 @@
+<ion-content [fullscreen]="true" class="bg-background text-text-primary">
+  <div class="mx-auto flex min-h-full w-full max-w-3xl flex-col gap-6 px-5 py-6">
+    <!-- Header with Logo -->
+    <div class="flex items-center justify-between">
+      <app-logo height="28"></app-logo>
+      <div class="flex items-center gap-2">
+        <button class="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-surface-border bg-surface-subtle text-text-primary" aria-label="Configurações" (click)="openSettings()">
+          <ion-icon name="settings-outline"></ion-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Title -->
+    <h1 class="text-4xl font-bold">Progresso</h1>
+
+    <!-- Metrics cards -->
+    <div class="space-y-4">
+      <!-- Conquistas -->
+      <div class="rounded-3xl border border-surface-border bg-surface/90 p-4 cursor-pointer hover:bg-surface/95 transition"
+           (click)="openAchievements()" role="button" aria-label="Abrir Conquistas" tabindex="0">
+        <div class="flex items-center gap-4">
+          <div class="inline-flex h-14 w-14 items-center justify-center rounded-2xl border-2 border-brand-accent/80 bg-surface-subtle">
+            <ion-icon name="trophy-outline" class="text-2xl"></ion-icon>
+          </div>
+          <div class="flex-1">
+            <div class="text-xl font-semibold">Conquistas</div>
+            <div class="text-text-secondary">{{ getConquistasAlcancadas() }} de {{ conquistas.length }} Alcançadas</div>
+            <div class="mt-2 h-3 rounded-full bg-surface-subtle">
+              <div class="h-3 rounded-full bg-gradient-to-r from-brand-gradientStart to-brand-gradientEnd" [style.width.%]="achievementsPercent"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Músicas e Sons -->
+      <div class="rounded-3xl border border-surface-border bg-surface/90 p-4 cursor-pointer hover:bg-surface/95 transition"
+           (click)="openSounds()" role="button" aria-label="Abrir Sons" tabindex="0">
+        <div class="flex items-center gap-4">
+          <div class="inline-flex h-14 w-14 items-center justify-center rounded-2xl border-2 border-brand-accent/80 bg-surface-subtle">
+            <ion-icon name="musical-notes-outline" class="text-2xl"></ion-icon>
+          </div>
+          <div class="flex-1">
+            <div class="text-xl font-semibold">Músicas e Sons</div>
+            <div class="text-text-secondary">{{ getMusicasEncontradas() }} de {{ soundsTotal }} Encontradas</div>
+            <div class="mt-2 h-3 rounded-full bg-surface-subtle">
+              <div class="h-3 rounded-full bg-gradient-to-r from-brand-gradientStart to-brand-gradientEnd" [style.width.%]="musicPercent"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Horas em Foco -->
+      <div class="rounded-3xl border border-surface-border bg-surface/90 p-4">
+        <div class="flex items-center gap-4">
+          <div class="inline-flex h-14 w-14 items-center justify-center rounded-2xl border-2 border-brand-accent/80 bg-surface-subtle">
+            <ion-icon name="flash-outline" class="text-2xl"></ion-icon>
+          </div>
+          <div class="flex-1">
+            <div class="text-xl font-semibold">Horas em Foco</div>
+            <div class="text-text-secondary">{{ avgFocusHoursPerDay || 0 }} horas/dia</div>
+            <div class="mt-2 h-3 rounded-full bg-surface-subtle">
+              <div class="h-3 rounded-full bg-gradient-to-r from-brand-gradientStart to-brand-gradientEnd" [style.width.%]="focusHoursPercent"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Streak card -->
+    <div class="rounded-3xl border border-surface-border bg-surface/90 p-6">
+      <div class="flex items-center gap-3">
+        <ion-icon name="flame-outline" class="text-brand-accent text-2xl"></ion-icon>
+        <div>
+          <div class="text-xl"><span class="mr-2 text-2xl font-semibold">{{ currentStreak || 0 }}</span>dias!</div>
+          <p class="-mt-1 text-sm text-text-secondary">Sequência de <span class="font-extrabold">FOCO</span></p>
+          <div class="mt-1 text-xs text-text-secondary">Recorde: <span class="font-semibold">{{ bestStreak || 0 }}</span> dias</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Month label with navigation -->
+    <div class="mx-auto flex w-max items-center gap-2 rounded-full bg-surface-subtle px-3 py-1 text-sm">
+      <button class="inline-flex h-7 w-7 items-center justify-center rounded-full text-text-secondary hover:text-text-primary disabled:opacity-50 disabled:cursor-not-allowed" [disabled]="!canPrevMonth" (click)="prevMonth()" aria-label="Mês anterior">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </button>
+      <div>
+        <span class="text-text-secondary">Dias de </span><span class="font-semibold">foco</span> em {{ monthLabel }}
+      </div>
+      <button class="inline-flex h-7 w-7 items-center justify-center rounded-full text-text-secondary hover:text-text-primary disabled:opacity-50 disabled:cursor-not-allowed" [disabled]="!canNextMonth" (click)="nextMonth()" aria-label="Próximo mês">
+        <ion-icon name="chevron-forward-outline"></ion-icon>
+      </button>
+    </div>
+
+    <!-- Calendar -->
+    <div class="mb-20">
+
+      <div class="grid grid-cols-7 text-center text-sm text-text-secondary">
+        <div *ngFor="let d of daysOfWeek" class="py-1">{{ d }}</div>
+      </div>
+      <div class="grid grid-cols-7 gap-y-3 text-center">
+        <ng-container *ngFor="let week of weeks">
+          <ng-container *ngFor="let cell of week">
+            <div class="flex h-10 items-center justify-center">
+              <ng-container *ngIf="cell.date; else empty">
+                <span [ngClass]="[
+                  cell.isToday ? 'rounded-md bg-gradient-to-r from-brand-gradientStart to-brand-gradientEnd text-white font-semibold px-2 py-1' : '',
+                  (!cell.isToday && cell.focused) ? 'rounded-md bg-brand-accent/20 text-brand-accent font-semibold px-2 py-1' : '',
+                  (!cell.isToday && !cell.focused && cell.inStreak) ? 'rounded-md ring-2 ring-brand-accent/60 px-2 py-1' : '',
+                  (!cell.isToday && !cell.focused && !cell.inStreak && cell.isPast) ? 'text-text-secondary' : '',
+                  (!cell.isToday && !cell.focused && !cell.inStreak && !cell.isPast) ? 'text-text-primary' : ''
+                ]">
+                  {{ cell.date.getDate() }}
+                </span>
+              </ng-container>
+              <ng-template #empty>
+                <span></span>
+              </ng-template>
+            </div>
+          </ng-container>
+        </ng-container>
+      </div>
+
+            <!-- Legend -->
+      <div class="mt-6 mb-2 flex justify-center flex-wrap items-center gap-3 text-xs text-text-secondary">
+        <div class="flex items-center gap-2">
+          <span class="rounded-md bg-gradient-to-r from-brand-gradientStart to-brand-gradientEnd px-2 py-0.5 text-white font-semibold">Hoje</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="rounded-md bg-brand-accent/20 px-2 py-0.5 text-brand-accent font-semibold">Foco</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="rounded-md ring-2 ring-brand-accent/60 px-2 py-0.5">Sequência</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="px-2 py-0.5 text-text-secondary">Passado</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom nav -->
+    <app-bottom-nav [active]="'progress'"></app-bottom-nav>
+  </div>
+</ion-content>

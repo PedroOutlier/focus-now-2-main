@@ -1,0 +1,194 @@
+<ion-content [fullscreen]="true" class="bg-background text-text-primary">
+  <div class="mx-auto w-full max-w-3xl px-5 py-6">
+    <!-- Header with Logo + Back -->
+    <div class="mb-6 flex items-center justify-between">
+      <app-logo height="28"></app-logo>
+      <button
+        class="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-surface-border bg-surface-subtle text-text-primary"
+        (click)="back()" aria-label="Voltar">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </button>
+    </div>
+
+    <!-- Timer settings card -->
+    <div class="mb-4 rounded-3xl border border-surface-border bg-surface/90 p-5">
+      <div class="mb-2 flex items-center gap-3 text-text-primary">
+        <ion-icon name="time-outline"></ion-icon>
+        <h2 class="text-lg font-semibold">Timer</h2>
+      </div>
+      <div class="mb-3 text-sm text-text-secondary">
+        Pomodoro: {{ timerConfig.pomodoro }} • Pausa Curta: {{ timerConfig.shortBreak }} • Pausa Longa: {{ timerConfig.longBreak }} • Longo a cada {{ timerConfig.longBreakInterval }} ciclos
+      </div>
+      <div class="grid gap-3 sm:grid-cols-2">
+        <label class="flex items-center justify-between rounded-2xl border border-surface-border bg-surface-subtle px-4 py-3">
+          <span>
+            <span class="block text-sm">Modo Automático</span>
+            <span class="block text-xs text-text-secondary">Alterna automaticamente entre foco e pausas</span>
+          </span>
+          <ion-toggle [(ngModel)]="settings.modoAutomatico" (ionChange)="saveSettings()"></ion-toggle>
+        </label>
+      </div>
+    </div>
+
+    <!-- Appearance card
+    <div class="mb-4 rounded-3xl border border-surface-border bg-surface/90 p-5">
+      <div class="mb-3 flex items-center gap-3 text-text-primary">
+        <ion-icon name="color-palette-outline"></ion-icon>
+        <h2 class="text-lg font-semibold">Aparência</h2>
+      </div>
+      <div class="grid gap-3 sm:grid-cols-2">
+        <label class="flex items-center justify-between rounded-2xl border border-surface-border bg-surface-subtle px-4 py-3">
+          <span class="text-sm">Tema Escuro</span>
+          <ion-toggle [(ngModel)]="settings.temaEscuro" (ionChange)="toggleTheme()"></ion-toggle>
+        </label>
+      </div>
+    </div> -->
+
+    <!-- Sounds card (mute, vibration, volume, autoplay/pause) -->
+    <div class="mb-6 rounded-3xl border border-surface-border bg-surface/90 p-5">
+      <div class="mb-3 flex items-center gap-3 text-text-primary">
+        <ion-icon name="volume-high-outline"></ion-icon>
+        <h2 class="text-lg font-semibold">Sons</h2>
+      </div>
+      <div class="grid gap-3 sm:grid-cols-2">
+        <label class="flex items-center justify-between rounded-2xl border border-surface-border bg-surface-subtle px-4 py-3">
+          <span>
+            <span class="block text-sm">Mutar</span>
+            <span class="block text-xs text-text-secondary">Silenciar sons do app</span>
+          </span>
+          <ion-toggle [(ngModel)]="settings.mutar" (ionChange)="saveSettings()"></ion-toggle>
+        </label>
+        <label class="flex items-center justify-between rounded-2xl border border-surface-border bg-surface-subtle px-4 py-3">
+          <span>
+            <span class="block text-sm">Vibração</span>
+            <span class="block text-xs text-text-secondary">Vibrar ao fim do timer</span>
+          </span>
+          <ion-toggle [(ngModel)]="vibrateOnEnd" (ionChange)="saveSettings()"></ion-toggle>
+        </label>
+        <label class="flex items-center justify-between rounded-2xl border border-surface-border bg-surface-subtle px-4 py-3">
+          <span>
+            <span class="block text-sm">Autoplay ao iniciar Foco</span>
+            <span class="block text-xs text-text-secondary">Tocar playlist automaticamente quando o foco começar</span>
+          </span>
+          <ion-toggle [(ngModel)]="autoplayOnFocus" (ionChange)="saveSettings()"></ion-toggle>
+        </label>
+        <label class="flex items-center justify-between rounded-2xl border border-surface-border bg-surface-subtle px-4 py-3">
+          <span>
+            <span class="block text-sm">Pausar nas Pausas</span>
+            <span class="block text-xs text-text-secondary">Parar a música automaticamente nos intervalos</span>
+          </span>
+          <ion-toggle [(ngModel)]="pauseOnBreaks" (ionChange)="saveSettings()"></ion-toggle>
+        </label>
+        <label class="flex items-center justify-between rounded-2xl border border-surface-border bg-surface-subtle px-4 py-3">
+          <span>
+            <span class="block text-sm">Pausar música ao pausar o Timer</span>
+            <span class="block text-xs text-text-secondary">Quando você apertar PAUSE, a música também pausa</span>
+          </span>
+          <ion-toggle [(ngModel)]="pauseMusicOnTimerPause" (ionChange)="saveSettings()"></ion-toggle>
+        </label>
+        <label class="flex items-center justify-between rounded-2xl border border-surface-border bg-surface-subtle px-4 py-3">
+          <span>
+            <span class="block text-sm">Mostrar modal ao concluir</span>
+            <span class="block text-xs text-text-secondary">Exibir um aviso quando o foco terminar</span>
+          </span>
+          <ion-toggle [(ngModel)]="showCompletionModal" (ionChange)="saveSettings()"></ion-toggle>
+        </label>
+        <div class="col-span-1 sm:col-span-2 rounded-2xl border border-surface-border bg-surface-subtle px-4 py-3">
+          <div class="mb-2 flex flex-wrap items-center justify-between gap-2">
+            <span class="text-sm">Som do Alarme</span>
+            <span class="text-xs text-text-secondary">{{ alarmSound === 'bell' ? 'Sino' : (alarmSound === 'digital' ? 'Digital' : (alarmSound === 'security' ? 'Alarme' : 'Beep (Sintético)')) }}</span>
+          </div>
+          <ion-segment [(ngModel)]="alarmSound" (ionChange)="saveSettings()" scrollable="true">
+            <ion-segment-button value="bell" title="Sino">
+              <ion-icon name="notifications-outline"></ion-icon>
+            </ion-segment-button>
+            <ion-segment-button value="digital" title="Digital">
+              <ion-icon name="cellular-outline"></ion-icon>
+            </ion-segment-button>
+            <ion-segment-button value="security" title="Alarme">
+              <ion-icon name="alert-circle-outline"></ion-icon>
+            </ion-segment-button>
+            <ion-segment-button value="beep" title="Beep (Sintético)">
+              <ion-icon name="musical-note-outline"></ion-icon>
+            </ion-segment-button>
+          </ion-segment>
+          <div class="mt-3 flex">
+            <ion-button size="small" shape="round" (click)="testAlarm()">
+              <ion-icon name="play"></ion-icon>
+              <span class="ml-2">Testar Alarme</span>
+            </ion-button>
+          </div>
+        </div>
+        <div class="col-span-1 sm:col-span-2 rounded-2xl border border-surface-border bg-surface-subtle px-4 py-3">
+          <div class="mb-2 flex items-center justify-between">
+            <span class="text-sm">Volume do Alarme</span>
+            <span class="text-xs text-text-secondary">{{ alarmVolumePercent }}%</span>
+          </div>
+          <ion-range min="0" max="100" step="1" [(ngModel)]="alarmVolumePercent" (ionChange)="saveSettings()"></ion-range>
+        </div>
+        <div class="col-span-1 sm:col-span-2 rounded-2xl border border-surface-border bg-surface-subtle px-4 py-3">
+          <div class="mb-2 flex items-center justify-between">
+            <span class="text-sm">Aviso antes do fim</span>
+            <span class="text-xs text-text-secondary">{{ preEndWarningSeconds }}s</span>
+          </div>
+          <ion-range min="0" max="30" step="1" [(ngModel)]="preEndWarningSeconds" (ionChange)="saveSettings()"></ion-range>
+        </div>
+        <div class="col-span-1 sm:col-span-2 rounded-2xl border border-surface-border bg-surface-subtle px-4 py-3">
+          <div class="mb-2 flex flex-wrap items-center justify-between gap-2">
+            <span class="text-sm">Modo de Reprodução</span>
+            <span class="text-xs text-text-secondary">{{ playbackMode === 'sequence' ? 'Sequencial' : (playbackMode === 'shuffle' ? 'Aleatório' : 'Repetir' ) }}</span>
+          </div>
+          <ion-segment [(ngModel)]="playbackMode" (ionChange)="saveSettings()" scrollable="true">
+            <ion-segment-button value="sequence">
+              <ion-icon name="swap-horizontal-outline"></ion-icon>
+            </ion-segment-button>
+            <ion-segment-button value="shuffle">
+              <ion-icon name="shuffle-outline"></ion-icon>
+            </ion-segment-button>
+            <ion-segment-button value="repeat-one">
+              <ion-icon name="repeat-outline"></ion-icon>
+            </ion-segment-button>
+          </ion-segment>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dev tools: only meaningful in non-production -->
+  <div class="mb-6 rounded-3xl border border-surface-border bg-surface/90 p-5" *ngIf="!environment.production">
+      <div class="mb-3 flex items-center gap-3 text-text-primary">
+        <ion-icon name="construct-outline"></ion-icon>
+        <h2 class="text-lg font-semibold">Desenvolvedor</h2>
+      </div>
+      <div class="grid gap-3">
+        <button class="inline-flex items-center gap-2 rounded-xl border border-surface-border bg-surface-subtle px-3 py-2 text-sm" (click)="devUnlockAll()">
+          <ion-icon name="unlock-outline"></ion-icon>
+          <span>Desbloquear Todos os Sons (Dev)</span>
+        </button>
+        <button class="inline-flex items-center gap-2 rounded-xl border border-surface-border bg-surface-subtle px-3 py-2 text-sm" (click)="devResetUser()">
+          <ion-icon name="refresh-circle-outline"></ion-icon>
+          <span>Resetar dados do usuário (Dev)</span>
+        </button>
+        <div class="text-xs text-text-secondary">Disponível apenas se o servidor estiver em modo de desenvolvimento.</div>
+      </div>
+    </div>
+
+    <!-- Account / Logout card -->
+    <div class="mb-6 rounded-3xl border border-surface-border bg-surface/90 p-5">
+      <div class="mb-2 flex items-center gap-3 text-text-primary">
+        <ion-icon name="person-circle-outline"></ion-icon>
+        <h2 class="text-lg font-semibold">Conta</h2>
+      </div>
+      <p class="mb-3 text-sm text-text-secondary">Sair da sua conta neste dispositivo.</p>
+      <button
+        class="inline-flex items-center gap-2 rounded-xl border border-surface-border bg-surface-subtle px-3 py-2 text-sm text-gray-100"
+        (click)="logout()" aria-label="Sair da conta (Logout)">
+        <ion-icon name="log-out-outline"></ion-icon>
+        <span>Sair</span>
+      </button>
+    </div>
+
+    <div class="rounded-3xl border border-surface-border bg-surface/90 p-5 text-sm text-text-secondary">
+      FocusNow v1.0.0
+    </div>
+  </div>
+</ion-content>
