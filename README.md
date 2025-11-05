@@ -1,5 +1,3 @@
-Aqui está a transformação completa para o Português Brasileiro (PT-BR) do seu documento de projeto do aplicativo Focus Now - Pomodoro Timer:
-
 Focus Now - Aplicativo Timer Pomodoro
 Um aplicativo completo de timer Pomodoro construído com Ionic/Angular no frontend e Node.js/MySQL no backend para um trabalho de faculdade.
 
