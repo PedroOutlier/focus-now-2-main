@@ -10,9 +10,14 @@
     "cap:sync": "npm run cap:ensure && npx cap sync android"
   },
   "devDependencies": {
+    "@capacitor/android": "7.0.0",
     "@capacitor/cli": "7.4.3",
     "@capacitor/core": "7.4.3",
-    "@capacitor/android": "7.0.0",
     "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "mysql": "^2.18.1"
   }
 }
